@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Street Cricket: Controlled Bat</title>
+
+<style>
+body {
+  margin: 0;
+  background: #0b0f0c;
+  font-family: Arial;
+  overflow: hidden;
+  color: white;
+}
+
+canvas {
+  display: block;
+  margin: auto;
+  background: linear-gradient(#1b5e20, #0d3b12);
+  border: 2px solid white;
+}
+
+#hud {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 16px;
+}
+
+#startScreen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+button { padding: 12px 20px; font-size: 18px; }
+</style>
+</head>
+
+<body>
+
+<div id="hud">
+Score: <span id="score">0</span> |
+Speed: <span id="speed">1</span> |
+Mode: <span id="mode">Street</span>
+</div>
+
+<div id="startScreen">
+  <h1>🏏 Street Cricket Control</h1>
+  <p>Move bat left/right + tap to swing</p>
+  <button onclick="startGame()">Start</button>
+</div>
+
+<canvas id="game" width="420" height="700"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+// STATE
+let ball = { x: 200, y: 0, r: 10 };
+
+let bat = {
+  x: 210,
+  targetX: 210,
+  y: 600
+};
+
+let speed = 2;
+let score = 0;
+let running = false;
+let mode = "Street";
+
+// swing
+let swing = 0;
+
+// RESET BALL
+function resetBall() {
+  ball.y = 0;
+  ball.x = Math.random() * 320 + 50;
+}
+
+// START
+function startGame() {
+  document.getElementById("startScreen").style.display = "none";
+
+  score = 0;
+  speed = 2;
+  mode = "Street";
+  running = true;
+
+  resetBall();
+  updateHUD();
+  loop();
+}
+
+// 🏏 DRAW REALISTIC BAT
+function drawBat() {
+  ctx.save();
+  ctx.translate(bat.x, bat.y);
+
+  // swing tilt
+  ctx.rotate(swing);
+
+  // shadow
+  ctx.fillStyle = "rgba(0,0,0,0.3)";
+  ctx.fillRect(-55, 5, 110, 12);
+
+  // blade (main bat)
+  ctx.fillStyle = "#f5e6c8";
+  ctx.fillRect(-60, 0, 120, 12);
+
+  // bat edge
+  ctx.fillStyle = "#d9c29c";
+  ctx.fillRect(-60, 0, 10, 12);
+
+  // handle
+  ctx.fillStyle = "#8b5a2b";
+  ctx.fillRect(-5, -40, 10, 40);
+
+  // grip
+  ctx.fillStyle = "#333";
+  ctx.fillRect(-5, -40, 10, 10);
+
+  ctx.restore();
+}
+
+// BALL
+function drawBall() {
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// HUD
+function updateHUD() {
+  document.getElementById("score").innerText = score;
+  document.getElementById("speed").innerText = speed.toFixed(1);
+  document.getElementById("mode").innerText = mode;
+}
+
+// LOOP
+function loop() {
+  if (!running) return;
+
+  ctx.clearRect(0,0,420,700);
+
+  drawBat();
+  drawBall();
+
+  ball.y += speed;
+
+  // bat smooth movement
+  bat.x += (bat.targetX - bat.x) * 0.2;
+
+  // swing decay
+  swing += (0 - swing) * 0.2;
+
+  if (ball.y > 700) {
+    gameOver();
+    return;
+  }
+
+  requestAnimationFrame(loop);
+}
+
+// HIT
+function hit() {
+  if (!running) return;
+
+  swing = -0.8; // flick swing
+
+  let distance = Math.abs(ball.x - bat.x);
+
+  if (ball.y > 540 && ball.y < 640) {
+
+    if (distance < 18) {
+      score += 2;
+      speed += 0.25;
+      mode = "PERFECT HIT 🔥";
+    } else {
+      score += 1;
+      speed += 0.15;
+    }
+
+    if (score >= 10) mode = "Competitive";
+    if (score >= 20) mode = "IPL Finals 🔥";
+
+    resetBall();
+    updateHUD();
+  }
+}
+
+// MOVE BAT LEFT/RIGHT (TAP CONTROL)
+window.addEventListener("mousemove", (e) => {
+  bat.targetX = e.clientX;
+});
+
+window.addEventListener("touchmove", (e) => {
+  bat.targetX = e.touches[0].clientX;
+});
+
+// HIT INPUT
+window.addEventListener("click", hit);
+window.addEventListener("touchstart", hit);
+
+// GAME OVER
+function gameOver() {
+  running = false;
+  alert("Game Over! Score: " + score);
+  document.getElementById("startScreen").style.display = "flex";
+}
+</script>
+
+</body>
+</html>
