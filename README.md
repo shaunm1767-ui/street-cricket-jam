@@ -1,11 +1,20 @@
-Street Cricket: Fan in the Crease
+# 🏏 Street Cricket: Fan in the Crease
 
-Arcade cricket game where timing-based hits keep a rally alive.
+An arcade-style cricket game inspired by street cricket culture.
 
-Core loop:
-Hit → Score → Speed increases → Environment evolves
+## 🎮 Gameplay
+Time your swing to hit the ball as it reaches the bat.
 
-Modes:
-Street → Competitive → IPL Finals
+## 🔥 Core Loop
+Hit → Score → Speed increases → Difficulty scales
 
-Built for AI Game Jam prototype submission.
+## 🏆 Progression
+- Street Mode
+- Competitive Mode (10+)
+- IPL Finals Mode (20+)
+
+## ⚡ Built For
+AI Game Jam (48-hour build challenge)
+
+## 🧠 Concept
+A fast, timing-based cricket experience focusing on reflex, rhythm, and arcade-style progression.
